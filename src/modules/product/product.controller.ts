@@ -6,6 +6,8 @@ import {
   Put,
   UseGuards,
   Post,
+  Delete,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductEntity } from './entities/product.entity';
@@ -31,6 +33,12 @@ export class ProductController {
   @Get('/all')
   async getAll() {
     return this.productService.getAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/:id')
+  async delete(@Param('id') id: string, @Query('quantity') quantity?: number) {
+    return this.productService.delete(id, quantity);
   }
 
   @UseGuards(JwtAuthGuard)

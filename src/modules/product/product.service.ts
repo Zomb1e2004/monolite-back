@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -48,6 +48,34 @@ export class ProductService {
     await this.productRepository.update(id, data);
 
     return (await this.productRepository.findOneBy({ id })) as ProductEntity;
+  }
+
+  async delete(
+    id: string,
+    quantity?: number,
+  ): Promise<ProductEntity | boolean> {
+    const product = await this.productRepository.findOneBy({ id });
+
+    if (!product) {
+      this.loggerService.log('Se intentó eliminar un producto inexistente');
+      throw new HttpException('El producto no existe', HttpStatus.NOT_FOUND);
+    }
+
+    if (quantity && quantity > 0) {
+      if (product.stock <= quantity) {
+        await this.productRepository.remove(product);
+
+        return true;
+      } else {
+        product.stock -= quantity;
+        await this.productRepository.save(product);
+
+        return product;
+      }
+    }
+
+    await this.productRepository.remove(product);
+    return true;
   }
 
   async getAll(): Promise<ProductEntity[] | null> {
