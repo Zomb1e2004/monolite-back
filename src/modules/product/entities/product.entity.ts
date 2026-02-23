@@ -17,6 +17,9 @@ export class ProductEntity {
   @Column()
   name: string;
 
+  @Column()
+  stock: number;
+
   @ManyToMany(() => SaleEntity, (sale) => sale.products)
   sales: SaleEntity[];
 
