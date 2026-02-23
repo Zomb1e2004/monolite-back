@@ -6,6 +6,7 @@ import { ClientModule } from './modules/client/client.module';
 import { SaleModule } from './modules/sale/sale.module';
 import { SaleService } from './modules/sale/sale.service';
 import { SaleController } from './modules/sale/sale.controller';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { SaleController } from './modules/sale/sale.controller';
     AuthModule,
     ClientModule,
     SaleModule,
+    ProductModule,
   ],
   providers: [SaleService],
   controllers: [SaleController],
