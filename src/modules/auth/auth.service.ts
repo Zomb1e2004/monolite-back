@@ -4,8 +4,10 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+
 import { UserService } from 'src/modules/user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { LoggerService } from 'src/shared/services/logger.service';
 
 import { hashPassword, comparePassword } from 'src/shared/utils/hashPassword';
 import { generateId } from 'src/shared/utils/generateId';
@@ -15,6 +17,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly loggerService: LoggerService,
   ) {}
 
   async signUp(data: { username: string; email: string; password: string }) {
@@ -22,6 +25,10 @@ export class AuthService {
 
     const existingUser = await this.userService.findByEmail(data.email);
     if (existingUser) {
+      this.loggerService.warn(
+        `Intento de registro con email ya existente: ${data.email}`,
+      );
+
       throw new HttpException(
         'Este correo ya está en uso',
         HttpStatus.CONFLICT,
@@ -47,11 +54,17 @@ export class AuthService {
   async signIn(data: { email: string; password: string }) {
     const user = await this.userService.findByEmail(data.email, true);
     if (!user) {
+      this.loggerService.warn(
+        `Intento de inicio de sesión con email no encontrado: ${data.email}`,
+      );
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
     const isMatch = await comparePassword(data.password, user.password);
     if (!isMatch) {
+      this.loggerService.warn(
+        `Intento de inicio de sesión con contraseña incorrecta para el email: ${data.email}`,
+      );
       throw new UnauthorizedException('Credenciales inválidas');
     }
 

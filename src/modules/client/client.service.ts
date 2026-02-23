@@ -4,12 +4,14 @@ import { Repository } from 'typeorm';
 
 import { ClientEntity } from './entities/client.entity';
 import { generateId } from 'src/shared/utils/generateId';
+import { LoggerService } from 'src/shared/services/logger.service';
 
 @Injectable()
 export class ClientService {
   constructor(
     @InjectRepository(ClientEntity)
     private readonly clientRepository: Repository<ClientEntity>,
+    private readonly loggerService: LoggerService,
   ) {}
 
   async add(client: {
@@ -22,6 +24,9 @@ export class ClientService {
     });
 
     if (existingClient) {
+      this.loggerService.warn(
+        `Intento de registro con cliente ya existente: ${client.firstnames} ${client.lastnames}`,
+      );
       throw new HttpException('Este cliente ya existe', HttpStatus.CONFLICT);
     }
 
