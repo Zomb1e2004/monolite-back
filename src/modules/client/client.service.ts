@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
 import { ClientEntity } from './entities/client.entity';
+import { generateId } from 'src/shared/utils/generateId';
 
 @Injectable()
 export class ClientService {
@@ -26,7 +26,7 @@ export class ClientService {
     }
 
     return await this.clientRepository.save({
-      id: uuidv4(),
+      id: generateId(),
       firstnames: client.firstnames,
       lastnames: client.lastnames,
     });

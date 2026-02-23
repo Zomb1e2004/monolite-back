@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { UserService } from 'src/modules/user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { v4 as uuidv4 } from 'uuid';
 
 import { hashPassword, comparePassword } from 'src/shared/utils/hashPassword';
+import { generateId } from 'src/shared/utils/generateId';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +29,7 @@ export class AuthService {
     }
 
     const user = await this.userService.create({
-      id: uuidv4(),
+      id: generateId(),
       username: data.username,
       email: data.email,
       password: hashedPassword,
