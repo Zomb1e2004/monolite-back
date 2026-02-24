@@ -18,7 +18,13 @@ export class SaleController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/')
-  async register(@Body() data: { clientId: string; products: string[] }) {
+  async register(
+    @Body()
+    data: {
+      clientId: string;
+      products: { productId: string; quantity: number }[];
+    },
+  ) {
     return this.saleService.register(data);
   }
 

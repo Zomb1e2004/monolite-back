@@ -6,10 +6,12 @@ import {
   PrimaryColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 import { ProductEntity } from 'src/modules/product/entities/product.entity';
 import { ClientEntity } from 'src/modules/client/entities/client.entity';
+import { SaleDetailEntity } from './sale-detail.entity';
 
 @Entity()
 export class SaleEntity {
@@ -22,6 +24,11 @@ export class SaleEntity {
   @ManyToMany(() => ProductEntity, (product) => product.sales)
   @JoinTable()
   products: ProductEntity[];
+
+  @OneToMany(() => SaleDetailEntity, (detail) => detail.sale, {
+    cascade: true,
+  })
+  details: SaleDetailEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

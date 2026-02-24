@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { SaleEntity } from './entities/sale.entity';
-import { ProductEntity } from '../product/entities/product.entity';
+import { SaleDetailEntity } from './entities/sale-detail.entity';
 
 import { LoggerService } from 'src/shared/services/logger.service';
 import { ClientService } from '../client/client.service';
@@ -21,27 +21,48 @@ export class SaleService {
     private readonly productService: ProductService,
   ) {}
 
-  async register(sale: { clientId: string; products: string[] }) {
+  async register(sale: {
+    clientId: string;
+    products: { productId: string; quantity: number }[];
+  }) {
     const client = await this.clientService.findById(sale.clientId);
+
     if (!client) {
       this.loggerService.warn(
         `Intento de registro de compra con cliente inexistente`,
       );
-
       throw new HttpException('Cliente inexistente', HttpStatus.NOT_FOUND);
     }
 
-    const validProducts: ProductEntity[] = (
-      await Promise.all(
-        sale.products.map((id) => this.productService.findById(id)),
-      )
-    ).filter((p): p is ProductEntity => p !== null);
+    const details: SaleDetailEntity[] = [];
 
-    return await this.saleRepository.save({
+    for (const item of sale.products) {
+      const product = await this.productService.findById(item.productId);
+
+      if (!product) {
+        this.loggerService.warn(
+          `Intento de registro de compra con producto inexistente`,
+        );
+        throw new HttpException(
+          `Producto inexistente: ${item.productId}`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      details.push({
+        id: generateId(),
+        product,
+        quantity: item.quantity,
+      } as SaleDetailEntity);
+    }
+
+    const newSale = this.saleRepository.create({
       id: generateId(),
       client,
-      products: validProducts,
+      details,
     });
+
+    return await this.saleRepository.save(newSale);
   }
 
   async delete(saleId: string) {
@@ -75,6 +96,13 @@ export class SaleService {
   }
 
   async getAll() {
-    return await this.saleRepository.find();
+    return await this.saleRepository.find({
+      relations: {
+        client: true,
+        details: {
+          product: true,
+        },
+      },
+    });
   }
 }
