@@ -60,9 +60,7 @@ export class ClientService {
     return (await this.clientRepository.findOneBy({ id })) as ClientEntity;
   }
 
-  async delete(id: string): Promise<boolean> {
+  async delete(id: string): Promise<void> {
     await this.clientRepository.delete(id);
-
-    return true;
   }
 }
