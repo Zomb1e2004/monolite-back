@@ -15,7 +15,11 @@ export class ProductService {
     private readonly loggerService: LoggerService,
   ) {}
 
-  async add(product: { name: string; stock?: number }): Promise<ProductEntity> {
+  async add(product: {
+    name: string;
+    price: number;
+    stock?: number;
+  }): Promise<ProductEntity> {
     const existingProduct = await this.productRepository.findOneBy({
       name: product.name,
     });
@@ -24,6 +28,7 @@ export class ProductService {
       const newProduct = await this.productRepository.save({
         id: generateId(),
         name: product.name,
+        price: product.price,
         stock: product.stock ?? 1,
       });
 

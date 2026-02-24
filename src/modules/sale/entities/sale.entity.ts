@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Column,
 } from 'typeorm';
 import { ClientEntity } from 'src/modules/client/entities/client.entity';
 import { SaleDetailEntity } from './sale-detail.entity';
@@ -22,6 +23,9 @@ export class SaleEntity {
     cascade: true,
   })
   details: SaleDetailEntity[];
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  totalAmount: number;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -25,9 +25,13 @@ export class ClientController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/all')
-  async getAll(@Query('onlyWithPurchases') onlyWithPurchases: string) {
-    const includePurchases = onlyWithPurchases === 'true';
-    return this.clientService.getAll(includePurchases);
+  async getAll(
+    @Query('onlyWithPurchases') onlyWithPurchases: string = 'false',
+    @Query('field') field: 'createdAt' | 'name' = 'name',
+    @Query('direction') direction: 'asc' | 'desc' = 'asc',
+  ) {
+    const onlyWithPurchasesBool = onlyWithPurchases === 'true';
+    return this.clientService.getAll(onlyWithPurchasesBool, field, direction);
   }
 
   @UseGuards(JwtAuthGuard)

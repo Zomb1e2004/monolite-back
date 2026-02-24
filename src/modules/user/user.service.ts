@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { UserEntity } from './entities/user.entity';
+import { byOrderItem } from 'src/shared/utils/byOrderItems';
 
 @Injectable()
 export class UserService {
@@ -21,10 +22,15 @@ export class UserService {
     return (await this.userRepository.findOneBy({ id })) as UserEntity;
   }
 
-  async getAll(): Promise<UserEntity[] | null> {
-    return await this.userRepository.find({
+  async getAll(
+    field: 'createdAt' | 'name' = 'name',
+    direction: 'asc' | 'desc' = 'asc',
+  ): Promise<UserEntity[] | null> {
+    const users = await this.userRepository.find({
       select: ['id', 'username', 'email', 'createdAt', 'updatedAt'],
     });
+
+    return byOrderItem(users, field, direction);
   }
 
   async findById(id: string, withPassword = false): Promise<UserEntity | null> {

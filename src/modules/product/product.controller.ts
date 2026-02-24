@@ -19,7 +19,7 @@ export class ProductController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/')
-  async add(@Body() data: { name: string; stock: number }) {
+  async add(@Body() data: { name: string; price: number; stock: number }) {
     return this.productService.add(data);
   }
 

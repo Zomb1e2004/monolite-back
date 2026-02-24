@@ -10,6 +10,7 @@ import { ClientService } from '../client/client.service';
 
 import { generateId } from 'src/shared/utils/generateId';
 import { ProductService } from '../product/product.service';
+import { byOrderItem } from 'src/shared/utils/byOrderItems';
 
 @Injectable()
 export class SaleService {
@@ -63,13 +64,18 @@ export class SaleService {
         id: generateId(),
         product,
         quantity: item.quantity,
+        price: product.price,
+        subtotal: product.price * item.quantity,
       } as SaleDetailEntity);
     }
+
+    const totalAmount = details.reduce((sum, d) => sum + d.subtotal, 0);
 
     const newSale = this.saleRepository.create({
       id: generateId(),
       client,
       details,
+      totalAmount,
     });
 
     return await this.saleRepository.save(newSale);
@@ -134,8 +140,11 @@ export class SaleService {
     });
   }
 
-  async getAll() {
-    return await this.saleRepository.find({
+  async getAll(
+    field: 'createdAt' | 'name' = 'name',
+    direction: 'asc' | 'desc' = 'asc',
+  ) {
+    const sales = await this.saleRepository.find({
       relations: {
         client: true,
         details: {
@@ -144,5 +153,7 @@ export class SaleService {
       },
       withDeleted: true,
     });
+
+    return byOrderItem(sales, field, direction);
   }
 }

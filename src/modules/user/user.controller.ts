@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Body, Put, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Body,
+  Put,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserEntity } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/modules/auth/auth.guard';
@@ -9,8 +17,11 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/all')
-  async getAll() {
-    return this.userService.getAll();
+  async getAll(
+    @Query('field') field: 'createdAt' | 'name' = 'name',
+    @Query('direction') direction: 'asc' | 'desc' = 'asc',
+  ) {
+    return this.userService.getAll(field, direction);
   }
 
   @UseGuards(JwtAuthGuard)

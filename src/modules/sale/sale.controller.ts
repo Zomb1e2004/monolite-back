@@ -6,6 +6,7 @@ import {
   Post,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { SaleService } from './sale.service';
 import { JwtAuthGuard } from 'src/modules/auth/auth.guard';
@@ -28,8 +29,11 @@ export class SaleController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/all')
-  async getAll() {
-    return this.saleService.getAll();
+  async getAll(
+    @Query('field') field: 'createdAt' | 'name' = 'name',
+    @Query('direction') direction: 'asc' | 'desc' = 'asc',
+  ) {
+    return this.saleService.getAll(field, direction);
   }
 
   @UseGuards(JwtAuthGuard)

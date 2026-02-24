@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { ClientEntity } from './entities/client.entity';
 import { generateId } from 'src/shared/utils/generateId';
 import { LoggerService } from 'src/shared/services/logger.service';
+import { byOrderItem } from 'src/shared/utils/byOrderItems';
 
 @Injectable()
 export class ClientService {
@@ -37,17 +38,25 @@ export class ClientService {
     });
   }
 
-  async getAll(onlyWithPurchases: boolean): Promise<ClientEntity[] | null> {
-    if (!onlyWithPurchases) {
-      return await this.clientRepository.find();
+  async getAll(
+    onlyWithPurchases: boolean,
+    field: 'createdAt' | 'name' = 'name',
+    direction: 'asc' | 'desc' = 'asc',
+  ): Promise<ClientEntity[] | null> {
+    let clients: ClientEntity[] = [];
+
+    if (onlyWithPurchases) {
+      clients = await this.clientRepository
+        .createQueryBuilder('client')
+        .leftJoinAndSelect('client.purchases', 'purchase')
+        .groupBy('client.id')
+        .having('COUNT(purchase.id) > 0')
+        .getMany();
+    } else {
+      clients = await this.clientRepository.find();
     }
 
-    return await this.clientRepository
-      .createQueryBuilder('client')
-      .leftJoinAndSelect('client.purchases', 'purchase')
-      .groupBy('client.id')
-      .having('COUNT(purchase.id) > 0')
-      .getMany();
+    return byOrderItem(clients, field, direction);
   }
 
   async findById(id: string): Promise<ClientEntity | null> {

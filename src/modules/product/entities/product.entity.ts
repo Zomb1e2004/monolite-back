@@ -20,6 +20,9 @@ export class ProductEntity {
   @Column()
   stock: number;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  price: number;
+
   @OneToMany(() => SaleDetailEntity, (detail) => detail.product)
   saleDetails: SaleDetailEntity[];
 

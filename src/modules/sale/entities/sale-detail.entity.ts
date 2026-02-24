@@ -21,4 +21,10 @@ export class SaleDetailEntity {
 
   @Column({ type: 'int' })
   quantity: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  price: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  subtotal: number;
 }
