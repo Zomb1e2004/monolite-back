@@ -46,7 +46,7 @@ export class ClientService {
       .createQueryBuilder('client')
       .leftJoinAndSelect('client.purchases', 'purchase')
       .groupBy('client.id')
-      .having('COUNT(purchase.id) > 1')
+      .having('COUNT(purchase.id) > 0')
       .getMany();
   }
 

@@ -49,6 +49,16 @@ export class SaleService {
         );
       }
 
+      if (product.stock < item.quantity) {
+        throw new HttpException(
+          `Stock insuficiente para el producto: ${product.id}`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      product.stock -= item.quantity;
+      await this.productService.update(product.id, product);
+
       details.push({
         id: generateId(),
         product,
@@ -101,12 +111,27 @@ export class SaleService {
 
     return await this.saleRepository.find({
       where: { client: { id: clientId } },
-      relations: ['products'],
+      relations: {
+        client: true,
+        details: {
+          product: true,
+        },
+      },
+      withDeleted: true,
     });
   }
 
   async findById(id: string) {
-    return this.saleRepository.findOneBy({ id });
+    return this.saleRepository.findOne({
+      where: { id },
+      relations: {
+        client: true,
+        details: {
+          product: true,
+        },
+      },
+      withDeleted: true,
+    });
   }
 
   async getAll() {
@@ -117,6 +142,7 @@ export class SaleService {
           product: true,
         },
       },
+      withDeleted: true,
     });
   }
 }

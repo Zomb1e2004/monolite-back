@@ -40,8 +40,7 @@ export class ProductController {
   @UseGuards(JwtAuthGuard)
   @Delete('/:id/deactivate')
   async deactivate(@Param('id') id: string) {
-    await this.productService.deactivate(id);
-    return { message: 'Producto desactivado correctamente' };
+    return await this.productService.deactivate(id);
   }
 
   @UseGuards(JwtAuthGuard)
