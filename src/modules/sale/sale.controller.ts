@@ -4,12 +4,10 @@ import {
   Param,
   Body,
   Post,
-  Put,
   Delete,
   UseGuards,
 } from '@nestjs/common';
 import { SaleService } from './sale.service';
-import { SaleEntity } from './entities/sale.entity';
 import { JwtAuthGuard } from 'src/modules/auth/auth.guard';
 
 @Controller('sale')
@@ -47,14 +45,8 @@ export class SaleController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('/:id')
-  async update(@Param('id') id: string, @Body() data: Partial<SaleEntity>) {
-    return this.saleService.update(id, data);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   async delete(@Param('id') id: string) {
-    return this.saleService.delete(id);
+    return this.saleService.cancel(id);
   }
 }
