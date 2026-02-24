@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { ProductEntity } from './entities/product.entity';
 import { generateId } from 'src/shared/utils/generateId';
+import { byOrderItem } from 'src/shared/utils/byOrderItems';
 import { LoggerService } from 'src/shared/services/logger.service';
 
 @Injectable()
@@ -86,8 +87,15 @@ export class ProductService {
     await this.productRepository.softDelete(id);
   }
 
-  async getAll(): Promise<ProductEntity[] | null> {
-    return await this.productRepository.find();
+  async getAll(
+    field: 'createdAt' | 'name' = 'name',
+    direction: 'asc' | 'desc' = 'asc',
+  ): Promise<ProductEntity[] | null> {
+    const products = await this.productRepository.find();
+
+    if (!products) return null;
+
+    return byOrderItem(products, field, direction);
   }
 
   async findById(id: string): Promise<ProductEntity | null> {

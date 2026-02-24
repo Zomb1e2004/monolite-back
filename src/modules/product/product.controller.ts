@@ -7,6 +7,7 @@ import {
   UseGuards,
   Post,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductEntity } from './entities/product.entity';
@@ -45,8 +46,11 @@ export class ProductController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/all')
-  async getAll() {
-    return this.productService.getAll();
+  async getAll(
+    @Query('field') field: 'createdAt' | 'name' = 'name',
+    @Query('direction') direction: 'asc' | 'desc' = 'asc',
+  ) {
+    return this.productService.getAll(field, direction);
   }
 
   @UseGuards(JwtAuthGuard)
