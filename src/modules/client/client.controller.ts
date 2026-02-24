@@ -45,6 +45,6 @@ export class ClientController {
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   async delete(@Param('id') id: string) {
-    return this.clientService.delete(id);
+    return this.clientService.deactivate(id);
   }
 }

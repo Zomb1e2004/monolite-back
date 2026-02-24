@@ -1,10 +1,10 @@
 import { Entity, PrimaryColumn, ManyToOne, Column, JoinColumn } from 'typeorm';
-import { SaleEntity } from 'src/modules/sale/entities/sale.entity';
+import { SaleEntity } from './sale.entity';
 import { ProductEntity } from 'src/modules/product/entities/product.entity';
 
 @Entity('sale_detail')
 export class SaleDetailEntity {
-  @PrimaryColumn()
+  @PrimaryColumn('text')
   id: string;
 
   @ManyToOne(() => SaleEntity, (sale) => sale.details, {
@@ -13,7 +13,7 @@ export class SaleDetailEntity {
   @JoinColumn({ name: 'sale_id' })
   sale: SaleEntity;
 
-  @ManyToOne(() => ProductEntity, {
+  @ManyToOne(() => ProductEntity, (product) => product.saleDetails, {
     eager: true,
   })
   @JoinColumn({ name: 'product_id' })

@@ -2,12 +2,12 @@ import {
   Entity,
   PrimaryColumn,
   Column,
-  ManyToMany,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
-
-import { SaleEntity } from 'src/modules/sale/entities/sale.entity';
+import { SaleDetailEntity } from 'src/modules/sale/entities/sale-detail.entity';
 
 @Entity()
 export class ProductEntity {
@@ -20,12 +20,15 @@ export class ProductEntity {
   @Column()
   stock: number;
 
-  @ManyToMany(() => SaleEntity, (sale) => sale.products)
-  sales: SaleEntity[];
+  @OneToMany(() => SaleDetailEntity, (detail) => detail.product)
+  saleDetails: SaleDetailEntity[];
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

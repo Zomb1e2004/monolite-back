@@ -45,42 +45,45 @@ export class ProductService {
     id: string,
     data: Partial<ProductEntity>,
   ): Promise<ProductEntity> {
-    const product = await this.productRepository.findOneBy({ id });
-    if (product) {
-      product.updatedAt = new Date();
-    }
-
     await this.productRepository.update(id, data);
 
     return (await this.productRepository.findOneBy({ id })) as ProductEntity;
   }
 
-  async delete(
-    id: string,
-    quantity?: number,
-  ): Promise<ProductEntity | boolean> {
+  async reduceStock(id: string, quantity: number): Promise<ProductEntity> {
     const product = await this.productRepository.findOneBy({ id });
 
     if (!product) {
-      this.loggerService.log('Se intentó eliminar un producto inexistente');
+      this.loggerService.log('Se intentó modificar un producto inexistente');
       throw new HttpException('El producto no existe', HttpStatus.NOT_FOUND);
     }
 
-    if (quantity && quantity > 0) {
-      if (product.stock <= quantity) {
-        await this.productRepository.remove(product);
-
-        return true;
-      } else {
-        product.stock -= quantity;
-        await this.productRepository.save(product);
-
-        return product;
-      }
+    if (quantity <= 0) {
+      throw new HttpException(
+        'La cantidad debe ser mayor a 0',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    await this.productRepository.remove(product);
-    return true;
+    if (product.stock <= quantity) {
+      await this.productRepository.softDelete(id);
+      return product;
+    }
+
+    product.stock -= quantity;
+    await this.productRepository.save(product);
+
+    return product;
+  }
+
+  async deactivate(id: string): Promise<void> {
+    const product = await this.productRepository.findOneBy({ id });
+
+    if (!product) {
+      throw new HttpException('El producto no existe', HttpStatus.NOT_FOUND);
+    }
+
+    await this.productRepository.softDelete(id);
   }
 
   async getAll(): Promise<ProductEntity[] | null> {

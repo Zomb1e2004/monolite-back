@@ -7,7 +7,6 @@ import {
   UseGuards,
   Post,
   Delete,
-  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductEntity } from './entities/product.entity';
@@ -30,15 +29,25 @@ export class ProductController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/all')
-  async getAll() {
-    return this.productService.getAll();
+  @Put('/:id/reduce-stock')
+  async reduceStock(
+    @Param('id') id: string,
+    @Body() data: { quantity: number },
+  ) {
+    return this.productService.reduceStock(id, data.quantity);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete('/:id')
-  async delete(@Param('id') id: string, @Query('quantity') quantity?: number) {
-    return this.productService.delete(id, quantity);
+  @Delete('/:id/deactivate')
+  async deactivate(@Param('id') id: string) {
+    await this.productService.deactivate(id);
+    return { message: 'Producto desactivado correctamente' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/all')
+  async getAll() {
+    return this.productService.getAll();
   }
 
   @UseGuards(JwtAuthGuard)

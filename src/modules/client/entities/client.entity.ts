@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   PrimaryColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 import { SaleEntity } from 'src/modules/sale/entities/sale.entity';
@@ -28,4 +29,7 @@ export class ClientEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

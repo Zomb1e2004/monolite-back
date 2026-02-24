@@ -1,15 +1,12 @@
 import {
   Entity,
-  ManyToOne,
-  ManyToMany,
-  JoinTable,
   PrimaryColumn,
+  ManyToOne,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
+  DeleteDateColumn,
 } from 'typeorm';
-
-import { ProductEntity } from 'src/modules/product/entities/product.entity';
 import { ClientEntity } from 'src/modules/client/entities/client.entity';
 import { SaleDetailEntity } from './sale-detail.entity';
 
@@ -21,10 +18,6 @@ export class SaleEntity {
   @ManyToOne(() => ClientEntity, (client) => client.purchases)
   client: ClientEntity;
 
-  @ManyToMany(() => ProductEntity, (product) => product.sales)
-  @JoinTable()
-  products: ProductEntity[];
-
   @OneToMany(() => SaleDetailEntity, (detail) => detail.sale, {
     cascade: true,
   })
@@ -35,4 +28,7 @@ export class SaleEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

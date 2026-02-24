@@ -60,7 +60,13 @@ export class ClientService {
     return (await this.clientRepository.findOneBy({ id })) as ClientEntity;
   }
 
-  async delete(id: string): Promise<void> {
-    await this.clientRepository.delete(id);
+  async deactivate(id: string): Promise<void> {
+    const client = await this.clientRepository.findOneBy({ id });
+
+    if (!client) {
+      throw new HttpException('Cliente no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    await this.clientRepository.softDelete(id);
   }
 }

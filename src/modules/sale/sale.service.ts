@@ -65,14 +65,28 @@ export class SaleService {
     return await this.saleRepository.save(newSale);
   }
 
-  async delete(saleId: string) {
-    await this.saleRepository.delete(saleId);
-  }
+  async cancel(saleId: string) {
+    const sale = await this.saleRepository.findOne({
+      where: { id: saleId },
+      relations: {
+        details: {
+          product: true,
+        },
+      },
+    });
 
-  async update(id: string, data: Partial<SaleEntity>): Promise<SaleEntity> {
-    await this.saleRepository.update(id, data);
+    if (!sale) {
+      this.loggerService.warn(`Intento de cancelación de compra inexistente`);
+      throw new HttpException('La venta no existe', HttpStatus.NOT_FOUND);
+    }
 
-    return (await this.saleRepository.findOneBy({ id })) as SaleEntity;
+    for (const detail of sale.details) {
+      await this.productService.update(detail.product.id, {
+        stock: detail.product.stock + detail.quantity,
+      });
+    }
+
+    await this.saleRepository.softDelete(saleId);
   }
 
   async getByClient(clientId: string) {
