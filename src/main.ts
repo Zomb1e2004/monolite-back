@@ -13,6 +13,11 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  app.enableCors({
+    origin: process.env.FRONT_URL,
+    methods: 'GET,PUT,PATCH,POST,DELETE',
+  });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 void bootstrap();

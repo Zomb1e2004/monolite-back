@@ -35,20 +35,12 @@ export class AuthService {
       );
     }
 
-    const user = await this.userService.create({
+    await this.userService.create({
       id: generateId(),
       username: data.username,
       email: data.email,
       password: hashedPassword,
     });
-
-    const payload = {
-      sub: user.id,
-      username: user.username,
-      email: user.email,
-    };
-
-    return { access_token: this.jwtService.sign(payload) };
   }
 
   async signIn(data: { email: string; password: string }) {
