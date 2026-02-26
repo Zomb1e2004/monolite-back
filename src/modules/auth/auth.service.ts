@@ -75,4 +75,29 @@ export class AuthService {
       },
     };
   }
+
+  async getMe(token: string) {
+    if (!token) throw new UnauthorizedException('Token no encontrado');
+
+    try {
+      const payload = this.jwtService.verify<{
+        sub: string;
+        username: string;
+        email: string;
+      }>(token);
+
+      const user = await this.userService.findById(payload.sub);
+      if (!user) throw new UnauthorizedException('Usuario no encontrado');
+
+      return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+    } catch {
+      throw new UnauthorizedException('Token inválido o expirado');
+    }
+  }
 }
