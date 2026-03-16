@@ -4,8 +4,8 @@ import { Injectable, Logger } from '@nestjs/common';
 export class LoggerService {
   private logger = new Logger('App');
 
-  log(message: string) {
-    this.logger.log(message);
+  log(message: string, data?: any) {
+    this.logger.log(message, data);
   }
 
   warn(message: string) {

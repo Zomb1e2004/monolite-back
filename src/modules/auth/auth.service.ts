@@ -40,6 +40,7 @@ export class AuthService {
       username: data.username,
       email: data.email,
       password: hashedPassword,
+      active: true,
     });
   }
 
@@ -59,6 +60,9 @@ export class AuthService {
       );
       throw new UnauthorizedException('Credenciales inválidas');
     }
+
+    user.lastLogin = new Date();
+    await this.userService.update(user.id, { lastLogin: user.lastLogin });
 
     const payload = {
       sub: user.id,
@@ -99,5 +103,53 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException('Token inválido o expirado');
     }
+  }
+
+  async disableUser(userId: string) {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      this.loggerService.warn(
+        `Intento de desactivar usuario inexistente: ${userId}`,
+      );
+      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    if (!user.active) {
+      throw new HttpException(
+        'El usuario ya está deshabilitado',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.userService.update(userId, { active: false });
+
+    this.loggerService.log(`Usuario deshabilitado: ${user.email}`);
+
+    return { message: 'Usuario deshabilitado correctamente' };
+  }
+
+  async enableUser(userId: string) {
+    const user = await this.userService.findById(userId);
+
+    if (!user) {
+      this.loggerService.warn(
+        `Intento de habilitar usuario inexistente: ${userId}`,
+      );
+      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    if (user.active) {
+      throw new HttpException(
+        'El usuario ya está habilitado',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.userService.update(userId, { active: true });
+
+    this.loggerService.log(`Usuario habilitado: ${user.email}`);
+
+    return { message: 'Usuario habilitado correctamente' };
   }
 }

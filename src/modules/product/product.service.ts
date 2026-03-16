@@ -106,4 +106,27 @@ export class ProductService {
   async findById(id: string): Promise<ProductEntity | null> {
     return await this.productRepository.findOneBy({ id });
   }
+
+  async getTopSellingProducts(): Promise<
+    { id: string; name: string; stock: number; totalSold: number }[]
+  > {
+    const result = await this.productRepository
+      .createQueryBuilder('product')
+      .innerJoin('product.saleDetails', 'detail')
+      .select('product.id', 'id')
+      .addSelect('product.name', 'name')
+      .addSelect('product.stock', 'stock')
+      .addSelect('SUM(detail.quantity)', 'totalSold')
+      .groupBy('product.id')
+      .orderBy('totalSold', 'DESC')
+      .limit(5)
+      .getRawMany<{
+        id: string;
+        name: string;
+        stock: number;
+        totalSold: number;
+      }>();
+
+    return result || [];
+  }
 }

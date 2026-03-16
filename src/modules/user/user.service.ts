@@ -27,7 +27,15 @@ export class UserService {
     direction: 'asc' | 'desc' = 'asc',
   ): Promise<UserEntity[] | null> {
     const users = await this.userRepository.find({
-      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'],
+      select: [
+        'id',
+        'username',
+        'email',
+        'lastLogin',
+        'active',
+        'createdAt',
+        'updatedAt',
+      ],
     });
 
     return byOrderItem(users, field, direction);

@@ -54,6 +54,12 @@ export class ProductController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/top-selling')
+  async getTopSellingProducts() {
+    return this.productService.getTopSellingProducts();
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/:id')
   async getById(@Param('id') id: string) {
     return this.productService.findById(id);

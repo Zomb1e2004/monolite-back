@@ -20,6 +20,15 @@ export class UserEntity {
   @Column()
   password: string;
 
+  @Column({
+    type: 'datetime',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  lastLogin: Date;
+
+  @Column({ default: true })
+  active: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

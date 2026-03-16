@@ -6,6 +6,8 @@ import {
   Req,
   UseGuards,
   Get,
+  Patch,
+  Param,
 } from '@nestjs/common';
 import type { Response, Request } from 'express';
 
@@ -20,7 +22,6 @@ interface RequestWithCookies extends Request {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post('sign-up')
   async signUp(
     @Body() data: { username: string; email: string; password: string },
@@ -61,5 +62,17 @@ export class AuthController {
   async me(@Req() req: RequestWithCookies) {
     const token = req.cookies['access_token'];
     return await this.authService.getMe(token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('disable/:id')
+  async disableUser(@Param('id') id: string) {
+    return this.authService.disableUser(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('enable/:id')
+  async enableUser(@Param('id') id: string) {
+    return this.authService.enableUser(id);
   }
 }
