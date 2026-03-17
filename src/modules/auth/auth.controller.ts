@@ -22,6 +22,7 @@ interface RequestWithCookies extends Request {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('sign-up')
   async signUp(
     @Body() data: { username: string; email: string; password: string },
@@ -46,6 +47,7 @@ export class AuthController {
     return { message: 'Inicio de sesión exitoso' };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('sign-out')
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token', {

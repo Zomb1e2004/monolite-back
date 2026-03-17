@@ -4,7 +4,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   PrimaryColumn,
+  OneToMany,
 } from 'typeorm';
+import { SaleEntity } from 'src/modules/sale/entities/sale.entity';
 
 @Entity()
 export class UserEntity {
@@ -28,6 +30,9 @@ export class UserEntity {
 
   @Column({ type: 'boolean', default: true })
   active: boolean;
+
+  @OneToMany(() => SaleEntity, (sale) => sale.user)
+  sales: SaleEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

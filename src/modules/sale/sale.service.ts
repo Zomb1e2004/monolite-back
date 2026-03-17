@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { SaleEntity } from './entities/sale.entity';
 import { SaleDetailEntity } from './entities/sale-detail.entity';
 
+import { UserService } from '../user/user.service';
 import { LoggerService } from 'src/shared/services/logger.service';
 import { ClientService } from '../client/client.service';
 
@@ -20,10 +21,12 @@ export class SaleService {
     private readonly clientService: ClientService,
     private readonly loggerService: LoggerService,
     private readonly productService: ProductService,
+    private readonly userService: UserService,
   ) {}
 
   async register(sale: {
     clientId: string;
+    userId: string;
     products: { productId: string; quantity: number }[];
   }) {
     const client = await this.clientService.findById(sale.clientId);
@@ -33,6 +36,15 @@ export class SaleService {
         `Intento de registro de compra con cliente inexistente`,
       );
       throw new HttpException('Cliente inexistente', HttpStatus.NOT_FOUND);
+    }
+
+    const user = await this.userService.findById(sale.userId);
+
+    if (!user) {
+      this.loggerService.warn(
+        `Intento de registro de compra con usuario inexistente`,
+      );
+      throw new HttpException('Usuario inexistente', HttpStatus.NOT_FOUND);
     }
 
     const details: SaleDetailEntity[] = [];
@@ -74,6 +86,7 @@ export class SaleService {
     const newSale = this.saleRepository.create({
       id: generateId(),
       client,
+      user, // 👈
       details,
       totalAmount,
     });
@@ -147,6 +160,7 @@ export class SaleService {
     const sales = await this.saleRepository.find({
       relations: {
         client: true,
+        user: true,
         details: {
           product: true,
         },

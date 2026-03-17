@@ -7,10 +7,12 @@ import { SaleEntity } from './entities/sale.entity';
 import { SaleController } from './sale.controller';
 import { SaleService } from './sale.service';
 import { SaleDetailEntity } from './entities/sale-detail.entity';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
     ClientModule,
+    UserModule,
     ProductModule,
     TypeOrmModule.forFeature([SaleEntity, SaleDetailEntity]),
   ],

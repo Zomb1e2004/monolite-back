@@ -20,6 +20,7 @@ export class SaleController {
   async register(
     @Body()
     data: {
+      userId: string;
       clientId: string;
       products: { productId: string; quantity: number }[];
     },
