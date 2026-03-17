@@ -42,7 +42,14 @@ export class UserService {
   }
 
   async findById(id: string, withPassword = false): Promise<UserEntity | null> {
-    const selectFields = ['id', 'username', 'email', 'createdAt', 'updatedAt'];
+    const selectFields = [
+      'id',
+      'username',
+      'email',
+      'active',
+      'createdAt',
+      'updatedAt',
+    ];
     if (withPassword) selectFields.push('password');
 
     return await this.userRepository.findOne({

@@ -26,7 +26,7 @@ export class UserEntity {
   })
   lastLogin: Date;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   active: boolean;
 
   @CreateDateColumn()
