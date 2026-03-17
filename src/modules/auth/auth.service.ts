@@ -105,7 +105,11 @@ export class AuthService {
     }
   }
 
-  async disableUser(userId: string) {
+  async disableUser(userId: string, key: string) {
+    if (key !== process.env.KEY_ACTION) {
+      throw new HttpException('Clave inválida', HttpStatus.UNAUTHORIZED);
+    }
+
     const user = await this.userService.findById(userId);
 
     if (!user) {
@@ -129,7 +133,11 @@ export class AuthService {
     return { message: 'Usuario deshabilitado correctamente' };
   }
 
-  async enableUser(userId: string) {
+  async enableUser(userId: string, key: string) {
+    if (key !== process.env.KEY_ACTION) {
+      throw new HttpException('Clave inválida', HttpStatus.UNAUTHORIZED);
+    }
+
     const user = await this.userService.findById(userId);
 
     if (!user) {

@@ -66,13 +66,13 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('disable/:id')
-  async disableUser(@Param('id') id: string) {
-    return this.authService.disableUser(id);
+  async disableUser(@Param('id') id: string, @Body('key') key: string) {
+    return this.authService.disableUser(id, key);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('enable/:id')
-  async enableUser(@Param('id') id: string) {
-    return this.authService.enableUser(id);
+  async enableUser(@Param('id') id: string, @Body('key') key: string) {
+    return this.authService.enableUser(id, key);
   }
 }
