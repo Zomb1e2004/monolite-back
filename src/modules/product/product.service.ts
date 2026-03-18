@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 
 import { ProductEntity } from './entities/product.entity';
 import { generateId } from 'src/shared/utils/generateId';
-import { byOrderItem } from 'src/shared/utils/byOrderItems';
 import { LoggerService } from 'src/shared/services/logger.service';
 
 @Injectable()
@@ -95,12 +94,49 @@ export class ProductService {
   async getAll(
     field: 'createdAt' | 'name' = 'name',
     direction: 'asc' | 'desc' = 'asc',
-  ): Promise<ProductEntity[] | null> {
-    const products = await this.productRepository.find();
+  ): Promise<
+    {
+      id: string;
+      name: string;
+      stock: number;
+      price: number;
+      createdAt: Date;
+      updatedAt: Date;
+      deletedAt: Date | null;
+      totalSold: number;
+    }[]
+  > {
+    const products = await this.productRepository
+      .createQueryBuilder('product')
+      .leftJoin('product.saleDetails', 'detail')
+      .select('product.id', 'id')
+      .addSelect('product.name', 'name')
+      .addSelect('product.stock', 'stock')
+      .addSelect('product.price', 'price')
+      .addSelect('product.createdAt', 'createdAt')
+      .addSelect('product.updatedAt', 'updatedAt')
+      .addSelect('product.deletedAt', 'deletedAt')
+      .addSelect('COALESCE(SUM(detail.quantity), 0)', 'totalSold')
+      .groupBy('product.id')
+      .addGroupBy('product.name')
+      .addGroupBy('product.stock')
+      .addGroupBy('product.price')
+      .addGroupBy('product.createdAt')
+      .addGroupBy('product.updatedAt')
+      .addGroupBy('product.deletedAt')
+      .orderBy(`product.${field}`, direction.toUpperCase() as 'ASC' | 'DESC')
+      .getRawMany<{
+        id: string;
+        name: string;
+        stock: number;
+        price: number;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        totalSold: number;
+      }>();
 
-    if (!products) return null;
-
-    return byOrderItem(products, field, direction);
+    return products || [];
   }
 
   async findById(id: string): Promise<ProductEntity | null> {
