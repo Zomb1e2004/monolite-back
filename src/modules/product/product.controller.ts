@@ -6,8 +6,8 @@ import {
   Put,
   UseGuards,
   Post,
-  Delete,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductEntity } from './entities/product.entity';
@@ -39,9 +39,15 @@ export class ProductController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete('/:id/deactivate')
-  async deactivate(@Param('id') id: string) {
-    return await this.productService.deactivate(id);
+  @Patch('/:id/deactivate')
+  async deactivate(@Param('id') id: string, @Body('key') key: string) {
+    return await this.productService.deactivate(id, key);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/:id/activate')
+  async activate(@Param('id') id: string, @Body('key') key: string) {
+    return await this.productService.activate(id, key);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -81,7 +81,11 @@ export class ProductService {
     return product;
   }
 
-  async deactivate(id: string): Promise<void> {
+  async deactivate(id: string, key: string): Promise<void> {
+    if (key !== process.env.KEY_ACTION) {
+      throw new HttpException('Clave inválida', HttpStatus.UNAUTHORIZED);
+    }
+
     const product = await this.productRepository.findOneBy({ id });
 
     if (!product) {
@@ -89,6 +93,32 @@ export class ProductService {
     }
 
     await this.productRepository.softDelete(id);
+  }
+
+  async activate(id: string, key: string): Promise<ProductEntity> {
+    if (key !== process.env.KEY_ACTION) {
+      throw new HttpException('Clave inválida', HttpStatus.UNAUTHORIZED);
+    }
+
+    const product = await this.productRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
+
+    if (!product) {
+      throw new HttpException('El producto no existe', HttpStatus.NOT_FOUND);
+    }
+
+    if (!product.deletedAt) {
+      throw new HttpException(
+        'El producto ya está activo',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.productRepository.restore(id);
+
+    return { ...product, deletedAt: undefined };
   }
 
   async getAll(
@@ -108,6 +138,7 @@ export class ProductService {
   > {
     const products = await this.productRepository
       .createQueryBuilder('product')
+      .withDeleted()
       .leftJoin('product.saleDetails', 'detail')
       .select('product.id', 'id')
       .addSelect('product.name', 'name')
